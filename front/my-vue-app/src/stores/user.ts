@@ -30,9 +30,11 @@ export const useUserStore = defineStore('user', {
         
         // 调用后端API获取当前用户信息
         const response = await api.get('/auth/me/')
-        this.user = response
+        // @ts-ignore
+        this.user = response.data
         // 默认选中用户所属场站，便于下游页面直接拉取备件数据
         if (!this.selectedStationId) {
+          // @ts-ignore
           this.selectedStationId = this.user?.site ?? null
         }
         return this.user
@@ -52,7 +54,8 @@ export const useUserStore = defineStore('user', {
             'Content-Type': 'application/json'
           }
         })
-        const { access } = response
+        // @ts-ignore
+        const { access } = response.data
         
         // 保存token
         localStorage.setItem('access_token', access)

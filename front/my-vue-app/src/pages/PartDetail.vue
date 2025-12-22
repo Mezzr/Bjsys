@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { usePartsStore } from '../stores/parts'
 import { useUserStore } from '../stores/user'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { ElMessage, ElTable, ElTableColumn, ElButton, ElTag, ElCard, ElDescriptions, ElDescriptionsItem, ElIcon, ElDialog, ElForm, ElFormItem, ElInputNumber, ElInput, ElRadioGroup, ElRadioButton } from 'element-plus'
-import { Warning, Edit, Back } from '@element-plus/icons-vue'
+import { ElMessage, ElButton, ElTag, ElCard, ElDescriptions, ElDescriptionsItem, ElDialog, ElForm, ElFormItem, ElInputNumber, ElInput, ElRadioGroup, ElRadioButton } from 'element-plus'
+import { Edit, Back } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 
 const partsStore = usePartsStore()

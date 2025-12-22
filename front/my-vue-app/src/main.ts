@@ -23,6 +23,7 @@ axios.defaults.withCredentials = true
 
 // 启用 DevTools（开发环境）
 if (import.meta.env.DEV) {
+  // @ts-ignore
   app.config.devtools = true
 }
 

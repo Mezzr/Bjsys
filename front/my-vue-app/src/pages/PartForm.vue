@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePartsStore } from '../stores/parts'
 import { useUserStore } from '../stores/user'
 import { storeToRefs } from 'pinia'
-import { ElMessage, ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElButton, ElUpload, ElIcon, ElAlert } from 'element-plus'
+import { ElMessage, ElForm, ElFormItem, ElInput, ElInputNumber, ElSelect, ElOption, ElButton, ElUpload, ElIcon } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import type { UploadProps } from 'element-plus'
 
@@ -70,6 +70,7 @@ onMounted(async () => {
         alarmQty: p.alarmQty || 5,
         procurementDays: p.procurementDays || 7,
         categoryId: p.categoryId || p.category?.id,
+        // @ts-ignore
         siteId: p.stationId ? Number(p.stationId) : undefined, // 映射 stationId 到 siteId
         status: p.status || 'active',
         imageUrl: p.imageUrl || ''
@@ -131,7 +132,7 @@ function goBack() {
   router.back()
 }
 
-const handleImageUpload: UploadProps['onChange'] = (file) => {
+const handleImageUpload: UploadProps['onChange'] = (file: any) => {
   if (file.raw) {
     const reader = new FileReader()
     reader.onload = (evt) => {

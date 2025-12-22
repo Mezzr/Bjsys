@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import type { Part } from '../stores/parts'
 import { usePartsStore } from '../stores/parts'
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
-import { ElTable, ElTableColumn, ElButton, ElInput, ElDialog, ElCard, ElSelect, ElOption, ElPagination, ElIcon } from 'element-plus'
-import { Search, HomeFilled, Warning } from '@element-plus/icons-vue'
+import { ElTable, ElTableColumn, ElButton, ElInput, ElSelect, ElOption, ElPagination, ElIcon } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 
 const partsStore = usePartsStore()
 const userStore = useUserStore()

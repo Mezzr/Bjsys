@@ -7,7 +7,7 @@ const api = axios.create({
 
 // 添加请求拦截器
 api.interceptors.request.use(
-  (config) => {
+  (config: any) => {
     const token = localStorage.getItem('access_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -16,7 +16,7 @@ api.interceptors.request.use(
     config.headers['Content-Type'] = 'application/json'
     return config
   },
-  (error) => {
+  (error: any) => {
     return Promise.reject(error)
   }
 )
@@ -25,7 +25,7 @@ import { ElMessage } from 'element-plus'
 
 // 添加响应拦截器
 api.interceptors.response.use(
-  (response) => {
+  (response: any) => {
     const res = response.data
     // 如果后端返回了 code 字段，且不为 0，则视为错误
     if (res && typeof res.code !== 'undefined' && res.code !== 0) {
@@ -34,7 +34,7 @@ api.interceptors.response.use(
     }
     return res
   },
-  (error) => {
+  (error: any) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token')
       window.location.href = '/login'
