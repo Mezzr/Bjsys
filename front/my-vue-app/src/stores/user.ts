@@ -39,9 +39,10 @@ export const useUserStore = defineStore('user', {
         }
         return this.user
       } catch (error) {
-        console.error('Failed to fetch user info:', error)
+       
         // 清除无效的令牌
         localStorage.removeItem('access_token')
+         console.error('Failed to fetch user info:', error)
         throw error
       }
     },
