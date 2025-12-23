@@ -1,0 +1,68 @@
+
+src/main.ts:26:14 - error TS2339: Property 'devtools' does not exist on type 'AppConfig'.
+
+26   app.config.devtools = true
+                ~~~~~~~~
+
+src/pages/PartDetail.vue:2:26 - error TS6133: 'computed' is declared but its value is never read.
+
+2 import { onMounted, ref, computed } from 'vue'
+                           ~~~~~~~~
+
+src/pages/PartDetail.vue:7:106 - error TS6133: 'ElIcon' is declared but its value is never read.
+
+7 import { ElMessage, ElTable, ElTableColumn, ElButton, ElTag, ElCard, ElDescriptions, ElDescriptionsItem, ElIcon, ElDialog, ElForm, ElFormItem, ElInputNumber, ElInput, ElRadioGroup, ElRadioButton } from 'element-plus'
+                                                                                                           ~~~~~~
+
+src/pages/PartDetail.vue:8:10 - error TS6133: 'Warning' is declared but its value is never read.
+
+8 import { Warning, Edit, Back } from '@element-plus/icons-vue'
+           ~~~~~~~
+
+src/pages/PartForm.vue:73:19 - error TS2339: Property 'stationId' does not exist on type '{ id: number; name: string; model?: string | undefined; description?: string | undefined; location?: string | undefined; supplier?: string | undefined; supplier_code?: string | undefined; ... 10 more ...; updated_at?: string | undefined; }'.
+
+73         siteId: p.stationId ? Number(p.stationId) : undefined, // 映射 stationId 到 siteId
+                     ~~~~~~~~~
+
+src/pages/PartForm.vue:73:40 - error TS2339: Property 'stationId' does not exist on type '{ id: number; name: string; model?: string | undefined; description?: string | undefined; location?: string | undefined; supplier?: string | undefined; supplier_code?: string | undefined; ... 10 more ...; updated_at?: string | undefined; }'.
+
+73         siteId: p.stationId ? Number(p.stationId) : undefined, // 映射 stationId 到 siteId
+                                          ~~~~~~~~~
+
+src/pages/PartsList.vue:2:36 - error TS6133: 'watch' is declared but its value is never read.
+
+2 import { onMounted, ref, computed, watch } from 'vue'
+                                     ~~~~~
+
+src/pages/PartsList.vue:4:1 - error TS6133: 'Part' is declared but its value is never read.
+
+4 import type { Part } from '../stores/parts'
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/pages/PartsList.vue:8:53 - error TS6133: 'ElDialog' is declared but its value is never read.
+
+8 import { ElTable, ElTableColumn, ElButton, ElInput, ElDialog, ElCard, ElSelect, ElOption, ElPagination, ElIcon } from 'element-plus'
+                                                      ~~~~~~~~
+
+src/pages/PartsList.vue:8:63 - error TS6133: 'ElCard' is declared but its value is never read.
+
+8 import { ElTable, ElTableColumn, ElButton, ElInput, ElDialog, ElCard, ElSelect, ElOption, ElPagination, ElIcon } from 'element-plus'
+                                                                ~~~~~~
+
+src/pages/PartsList.vue:9:18 - error TS6133: 'HomeFilled' is declared but its value is never read.
+
+9 import { Search, HomeFilled, Warning } from '@element-plus/icons-vue'
+                   ~~~~~~~~~~
+
+src/stores/user.ts:33:9 - error TS2740: Type 'AxiosResponse<any, any, {}>' is missing the following properties from type '{ id: string; username: string; email: string; site: string | null; site_id?: number | null | undefined; can_edit_own_site: boolean; can_view_all_sites: boolean; can_manage_users: boolean; name?: string | ... 1 more ... | undefined; token?: string | undefined; }': id, username, email, site, and 3 more.
+
+33         this.user = response
+           ~~~~~~~~~
+
+src/stores/user.ts:55:17 - error TS2339: Property 'access' does not exist on type 'AxiosResponse<any, any, {}>'.
+
+55         const { access } = response
+                   ~~~~~~
+
+
+Found 13 errors.

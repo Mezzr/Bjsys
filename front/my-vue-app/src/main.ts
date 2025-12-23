@@ -22,6 +22,7 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:
 axios.defaults.withCredentials = true
 
 // 启用 DevTools（开发环境）
+// Fix TypeScript errors for server build
 if (import.meta.env.DEV) {
   // @ts-ignore
   app.config.devtools = true
