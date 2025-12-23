@@ -54,7 +54,7 @@ export const useUserStore = defineStore('user', {
             'Content-Type': 'application/json'
           }
         })
-        // @ts-ignore
+        // @ts
         const { access } = response
         
         // 保存token
