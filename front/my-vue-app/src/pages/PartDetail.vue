@@ -4,9 +4,10 @@ import { usePartsStore } from '../stores/parts'
 import { useUserStore } from '../stores/user'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { ElMessage, ElButton, ElTag, ElCard, ElDescriptions, ElDescriptionsItem, ElDialog, ElForm, ElFormItem, ElInputNumber, ElInput, ElRadioGroup, ElRadioButton } from 'element-plus'
+import { ElMessage, ElButton, ElTag, ElCard, ElDescriptions, ElDescriptionsItem, ElDialog, ElForm, ElFormItem, ElInputNumber, ElInput, ElRadioGroup, ElRadioButton, ElImage } from 'element-plus'
 import { Edit, Back } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
+import { getImageUrl } from '../utils/image'
 
 const partsStore = usePartsStore()
 const userStore = useUserStore()
@@ -34,11 +35,6 @@ function canEdit() {
   return true
 }
 
-function goEdit() {
-  if (!part.value) return
-  router.push({ name: 'PartEdit', params: { id: part.value.id } })
-}
-
 function goBack() {
   router.back()
 }
@@ -59,6 +55,11 @@ function openTransactionDialog(type: 'in' | 'out') {
 async function submitTransaction() {
   if (!part.value) return
   
+  if (!transactionForm.value.reason || !transactionForm.value.reason.trim()) {
+    ElMessage.warning('请填写备注（出入库原因）')
+    return
+  }
+
   submitting.value = true
   try {
     await partsStore.createTransaction({
@@ -91,7 +92,6 @@ async function submitTransaction() {
       <div class="actions">
         <el-button type="success" @click="openTransactionDialog('in')">入库</el-button>
         <el-button type="warning" @click="openTransactionDialog('out')">出库</el-button>
-        <el-button v-if="canEdit()" type="primary" :icon="Edit" @click="goEdit">编辑备件</el-button>
       </div>
     </div>
 
@@ -107,10 +107,13 @@ async function submitTransaction() {
     <div class="content-grid">
       <div class="left-panel">
         <el-card shadow="never" class="image-card">
-          <img 
+          <el-image 
             v-if="part.imageUrl" 
-            :src="part.imageUrl" 
+            :src="getImageUrl(part.imageUrl)" 
             class="part-image"
+            fit="contain"
+            :preview-src-list="[getImageUrl(part.imageUrl)]"
+            preview-teleported
           />
           <div v-else class="no-image">暂无图片</div>
         </el-card>

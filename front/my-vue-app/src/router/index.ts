@@ -8,8 +8,7 @@ const routes = [
   { path: '/', redirect: '/parts' },
   { path: '/parts', name: 'PartsList', component: PartsList },
   { path: '/parts/new', name: 'PartCreate', component: PartForm },
-  { path: '/parts/:id', name: 'PartDetail', component: PartDetail, props: true },
-  { path: '/parts/:id/edit', name: 'PartEdit', component: PartForm, props: true }
+  { path: '/parts/:id', name: 'PartDetail', component: PartDetail, props: true }
 ]
 
 const router = createRouter({

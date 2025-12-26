@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePartsStore } from '../stores/parts'
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
-import { ElTable, ElTableColumn, ElButton, ElInput, ElSelect, ElOption, ElPagination, ElIcon } from 'element-plus'
-import { Search } from '@element-plus/icons-vue'
+import { ElTable, ElTableColumn, ElButton, ElInput, ElSelect, ElOption, ElPagination, ElIcon, ElMessageBox, ElMessage } from 'element-plus'
+import { Search, Warning, Delete } from '@element-plus/icons-vue'
 
 const partsStore = usePartsStore()
 const userStore = useUserStore()
@@ -16,7 +16,11 @@ const selectedCategory = ref<number | undefined>(undefined)
 const selectedSite = ref<number | undefined>(undefined)
 const selectedStatus = ref<string | undefined>(undefined)
 const currentPage = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
+
+// 批量删除相关
+const isBatchDeleteMode = ref(false)
+const selectedRows = ref<any[]>([])
 
 const canCreate = computed(() => {
   const user = userStore.user
@@ -26,16 +30,36 @@ const canCreate = computed(() => {
 })
 
 onMounted(async () => {
-  await userStore.fetchMe()
+  try {
+    await userStore.fetchMe()
+  } catch (e) {
+    // 未登录或token无效，不影响页面加载
+  }
   await partsStore.fetchCategories()
   await partsStore.fetchSites()
   
-  // 默认选中用户所属场站
-  if (userStore.user?.site_id) {
+  // 默认选中用户所属场站 (如果用户只能看自己场站)
+  if (userStore.user?.site_id && !userStore.user.can_view_all_sites) {
     selectedSite.value = userStore.user.site_id
   }
   
   await loadParts()
+})
+
+// 监听用户变化，登录后自动选中所属场站并刷新数据
+watch(() => userStore.user, (newUser) => {
+  if (newUser?.site_id && !newUser.can_view_all_sites) {
+    selectedSite.value = newUser.site_id
+    loadParts()
+  } else if (!newUser) {
+    // 登出后，清空场站选择，并清空列表（或者重新加载全部数据，取决于需求）
+    selectedSite.value = undefined
+    // 如果希望登出后不显示任何数据，可以清空 parts
+    parts.value = []
+    total.value = 0
+    // 或者如果希望显示公开数据，则调用 loadParts()
+    // loadParts() 
+  }
 })
 
 async function loadParts() {
@@ -60,39 +84,77 @@ function handlePageChange(page: number) {
   loadParts()
 }
 
+function handleSizeChange(val: number) {
+  pageSize.value = val
+  currentPage.value = 1
+  loadParts()
+}
+
 function getAlarmStatus(qty: number, alarmQty: number = 0) {
   if (alarmQty && qty <= alarmQty) return 'alert'
   return 'normal'
+}
+
+function tableRowClassName({ row }: { row: any }) {
+  if (row.alarmQty && row.quantity <= row.alarmQty) {
+    return 'warning-row'
+  }
+  return ''
 }
 
 function goDetail(id: string | number) {
   router.push({ name: 'PartDetail', params: { id: String(id) } })
 }
 
-function goEdit(id: string | number) {
-  router.push({ name: 'PartEdit', params: { id: String(id) } })
+function toggleBatchDeleteMode() {
+  isBatchDeleteMode.value = !isBatchDeleteMode.value
+  selectedRows.value = []
 }
 
-async function handleDelete(id: string | number) {
-  if (!confirm('确定删除该备件吗？')) return
-  await partsStore.deletePart(id)
-  await loadParts()
+function handleSelectionChange(val: any[]) {
+  selectedRows.value = val
+}
+
+async function handleBatchDelete() {
+  if (selectedRows.value.length === 0) return
+  
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除选中的 ${selectedRows.value.length} 个备件吗？此操作不可恢复！`,
+      '批量删除确认',
+      {
+        confirmButtonText: '确定删除',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    )
+    
+    // 循环删除
+    // 注意：实际项目中建议后端提供批量删除接口
+    let successCount = 0
+    for (const row of selectedRows.value) {
+      try {
+        await partsStore.deletePart(row.id)
+        successCount++
+      } catch (e) {
+        console.error(`Failed to delete part ${row.id}`, e)
+      }
+    }
+    
+    ElMessage.success(`成功删除 ${successCount} 个备件`)
+    isBatchDeleteMode.value = false
+    selectedRows.value = []
+    await loadParts()
+    
+  } catch (e) {
+    // Cancelled
+  }
 }
 </script>
 
 <template>
   <div class="parts-list-container">
     <div class="header-actions">
-      <!-- Debug Info -->
-      <!-- <div v-if="true" style="background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-size: 12px;">
-        <strong>Debug Info:</strong>
-        Loading: {{ loading }} | 
-        Total: {{ total }} | 
-        Parts Length: {{ parts ? parts.length : 'null' }}
-        <br>
-        First Part: {{ parts && parts.length > 0 ? JSON.stringify(parts[0]) : 'None' }}
-      </div> -->
-
       <div class="filters">
         <el-input
           v-model="searchQuery"
@@ -108,13 +170,13 @@ async function handleDelete(id: string | number) {
         </el-input>
         
         <el-select 
-          v-if="userStore.user?.can_view_all_sites"
           v-model="selectedSite" 
           placeholder="场站" 
           clearable 
           @change="handleSearch" 
           style="width: 150px"
         >
+          <el-option label="所有场站" :value="undefined" />
           <el-option v-for="s in sites" :key="s.id" :label="s.name" :value="s.id" />
         </el-select>
 
@@ -122,20 +184,42 @@ async function handleDelete(id: string | number) {
           <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
         </el-select>
 
-        <el-select v-model="selectedStatus" placeholder="状态" clearable @change="handleSearch" style="width: 120px">
-          <el-option label="正常" value="normal" />
-          <el-option label="停用" value="inactive" />
-        </el-select>
-
         <el-button type="primary" @click="handleSearch">查询</el-button>
       </div>
       
-      <el-button v-if="canCreate" type="success" @click="router.push({ name: 'PartCreate' })">
-        新增备件
-      </el-button>
+      <div class="action-buttons">
+        <el-button 
+          v-if="isBatchDeleteMode" 
+          type="danger" 
+          :disabled="selectedRows.length === 0"
+          @click="handleBatchDelete"
+        >
+          删除选中 ({{ selectedRows.length }})
+        </el-button>
+        
+        <el-button 
+          :type="isBatchDeleteMode ? 'info' : 'danger'" 
+          plain
+          @click="toggleBatchDeleteMode"
+        >
+          {{ isBatchDeleteMode ? '取消批量' : '批量删除' }}
+        </el-button>
+
+        <el-button v-if="canCreate" type="success" @click="router.push({ name: 'PartCreate' })">
+          新增备件
+        </el-button>
+      </div>
     </div>
 
-    <el-table :data="parts" v-loading="loading" style="width: 100%; margin-top: 20px" border>
+    <el-table 
+      :data="parts" 
+      v-loading="loading" 
+      style="width: 100%; margin-top: 20px" 
+      border
+      :row-class-name="tableRowClassName"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column v-if="isBatchDeleteMode" type="selection" width="55" />
       <el-table-column prop="name" label="名称" min-width="120" />
       <el-table-column prop="model" label="型号" min-width="100" />
       <el-table-column prop="stationName" label="所属场站" min-width="120" />
@@ -150,11 +234,9 @@ async function handleDelete(id: string | number) {
         </template>
       </el-table-column>
       <el-table-column prop="alarmQty" label="告警阈值" width="100" />
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="80" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="goDetail(row.id)">详情</el-button>
-          <el-button link type="primary" @click="goEdit(row.id)">编辑</el-button>
-          <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -163,8 +245,10 @@ async function handleDelete(id: string | number) {
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
+        :page-sizes="[5, 10, 20, 50]"
         :total="total"
-        layout="total, prev, pager, next"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
         @current-change="handlePageChange"
       />
     </div>
@@ -184,5 +268,11 @@ async function handleDelete(id: string | number) {
 .filters {
   display: flex;
   gap: 10px;
+}
+:deep(.el-table .warning-row) {
+  --el-table-tr-bg-color: var(--el-color-danger-light-9);
+}
+:deep(.el-table .warning-row:hover > td.el-table__cell) {
+  background-color: var(--el-color-danger-light-8) !important;
 }
 </style>

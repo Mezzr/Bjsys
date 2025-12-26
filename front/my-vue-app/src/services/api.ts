@@ -35,9 +35,13 @@ api.interceptors.response.use(
     return res
   },
   (error: any) => {
-    if (error.response?.status === 401) {
+    // 排除登录接口本身的 401 错误，避免死循环
+    const isLoginRequest = error.config?.url?.includes('/auth/login/')
+    
+    if (error.response?.status === 401 && !isLoginRequest) {
       localStorage.removeItem('access_token')
-      window.location.href = '/login'
+      // 既然没有独立的登录页，就不要跳转了，或者跳转回首页
+      // window.location.href = '/'
     }
     ElMessage.error(error.message || '网络错误')
     return Promise.reject(error)

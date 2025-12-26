@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import F, Case, When, Value, BooleanField
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -233,6 +234,16 @@ class SparePartViewSet(viewsets.ModelViewSet):
         if search:
             queryset = queryset.filter(name__icontains=search) | queryset.filter(model__icontains=search)
         
+        # 优先显示库存告警的备件
+        # 告警条件: quantity <= alarm_qty
+        queryset = queryset.annotate(
+            is_alarm=Case(
+                When(quantity__lte=F('alarm_qty'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).order_by('-is_alarm', '-created_at')
+
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
