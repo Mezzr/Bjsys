@@ -5,7 +5,7 @@ import { useUserStore } from '../stores/user'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { ElMessage, ElButton, ElTag, ElCard, ElDescriptions, ElDescriptionsItem, ElDialog, ElForm, ElFormItem, ElInputNumber, ElInput, ElRadioGroup, ElRadioButton, ElImage } from 'element-plus'
-import { Edit, Back } from '@element-plus/icons-vue'
+import { Back } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { getImageUrl } from '../utils/image'
 
@@ -29,11 +29,6 @@ onMounted(async () => {
   await partsStore.getPart(id)
   await partsStore.fetchTransactions(id)
 })
-
-function canEdit() {
-  // Assuming backend handles permission checks or we check against user site if needed
-  return true
-}
 
 function goBack() {
   router.back()

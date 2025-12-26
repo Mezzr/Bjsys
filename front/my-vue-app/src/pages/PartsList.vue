@@ -5,7 +5,7 @@ import { usePartsStore } from '../stores/parts'
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
 import { ElTable, ElTableColumn, ElButton, ElInput, ElSelect, ElOption, ElPagination, ElIcon, ElMessageBox, ElMessage } from 'element-plus'
-import { Search, Warning, Delete } from '@element-plus/icons-vue'
+import { Search, Warning } from '@element-plus/icons-vue'
 
 const partsStore = usePartsStore()
 const userStore = useUserStore()
@@ -176,7 +176,7 @@ async function handleBatchDelete() {
           @change="handleSearch" 
           style="width: 150px"
         >
-          <el-option label="所有场站" :value="undefined" />
+          <el-option label="所有场站" :value="''" />
           <el-option v-for="s in sites" :key="s.id" :label="s.name" :value="s.id" />
         </el-select>
 
