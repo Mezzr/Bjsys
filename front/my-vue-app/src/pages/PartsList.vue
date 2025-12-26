@@ -35,6 +35,25 @@ onMounted(async () => {
   } catch (e) {
     // 未登录或token无效，不影响页面加载
   }
+  
+  if (userStore.user) {
+    await initPageData()
+  }
+})
+
+// 监听用户变化，登录后自动选中所属场站并刷新数据
+watch(() => userStore.user, (newUser) => {
+  if (newUser) {
+    initPageData()
+  } else {
+    // 登出后，清空数据
+    selectedSite.value = undefined
+    parts.value = []
+    total.value = 0
+  }
+})
+
+async function initPageData() {
   await partsStore.fetchCategories()
   await partsStore.fetchSites()
   
@@ -44,25 +63,10 @@ onMounted(async () => {
   }
   
   await loadParts()
-})
-
-// 监听用户变化，登录后自动选中所属场站并刷新数据
-watch(() => userStore.user, (newUser) => {
-  if (newUser?.site_id && !newUser.can_view_all_sites) {
-    selectedSite.value = newUser.site_id
-    loadParts()
-  } else if (!newUser) {
-    // 登出后，清空场站选择，并清空列表（或者重新加载全部数据，取决于需求）
-    selectedSite.value = undefined
-    // 如果希望登出后不显示任何数据，可以清空 parts
-    parts.value = []
-    total.value = 0
-    // 或者如果希望显示公开数据，则调用 loadParts()
-    // loadParts() 
-  }
-})
+}
 
 async function loadParts() {
+  if (!userStore.user) return
   await partsStore.fetchParts({
     page: currentPage.value,
     limit: pageSize.value,
