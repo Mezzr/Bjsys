@@ -117,13 +117,14 @@ class SparePartSerializer(serializers.ModelSerializer):
     )
     siteId = serializers.IntegerField(write_only=True, required=False, allow_null=True)
     categoryName = serializers.SerializerMethodField()
+    image = serializers.ImageField(write_only=True, required=False, allow_null=True)
     
     class Meta:
         model = SparePart
         fields = [
             'id', 'name', 'model', 'description', 'location',
             'supplier', 'supplier_code', 'quantity', 'alarmQty',
-            'procurementDays', 'imageUrl', 'stationId', 'stationName', 'siteId', 'category',
+            'procurementDays', 'imageUrl', 'image', 'stationId', 'stationName', 'siteId', 'category',
             'categoryId', 'categoryName', 'status', 'created_by', 'created_at', 'updated_by',
             'updated_at', 'last_purchase_date', 'last_use_date'
         ]

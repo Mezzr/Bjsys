@@ -73,11 +73,11 @@ export const usePartsStore = defineStore('parts', {
         this.loading = false
       }
     },
-    async createPart(data: Partial<Part>) {
+    async createPart(data: Partial<Part> | FormData) {
       const res = await partsApi.createSparePart(data)
       return res.data || res
     },
-    async updatePart(id: string | number, data: Partial<Part>) {
+    async updatePart(id: string | number, data: Partial<Part> | FormData) {
       const res = await partsApi.updateSparePart(id, data)
       return res.data || res
     },

@@ -33,6 +33,7 @@ const form = ref({
   status: 'active', // 默认值
   imageUrl: ''
 })
+const rawFile = ref<File | null>(null)
 const loading = ref(false)
 
 const rules = {
@@ -90,13 +91,32 @@ async function submit() {
 
       loading.value = true
       try {
+        // 构建 FormData
+        const formData = new FormData()
+        formData.append('name', form.value.name)
+        formData.append('model', form.value.model)
+        formData.append('description', form.value.description || '')
+        formData.append('location', form.value.location || '')
+        formData.append('supplier', form.value.supplier || '')
+        formData.append('supplier_code', form.value.supplier_code || '')
+        formData.append('quantity', String(form.value.quantity))
+        formData.append('alarmQty', String(form.value.alarmQty)) 
+        formData.append('procurementDays', String(form.value.procurementDays))
+        if (form.value.categoryId) formData.append('categoryId', String(form.value.categoryId))
+        if (form.value.siteId) formData.append('siteId', String(form.value.siteId))
+        formData.append('status', form.value.status)
+        
+        if (rawFile.value) {
+          formData.append('image', rawFile.value)
+        }
+
         if (isEdit) {
           const id = route.params.id as string
-          await partsStore.updatePart(id, form.value)
+          await partsStore.updatePart(id, formData)
           ElMessage.success('更新成功')
           router.push({ name: 'PartDetail', params: { id } })
         } else {
-          await partsStore.createPart(form.value)
+          await partsStore.createPart(formData)
           ElMessage.success('创建成功')
           router.push({ name: 'PartsList' })
         }
@@ -134,6 +154,7 @@ function goBack() {
 
 const handleImageUpload: UploadProps['onChange'] = (file: any) => {
   if (file.raw) {
+    rawFile.value = file.raw
     const reader = new FileReader()
     reader.onload = (evt) => {
       form.value.imageUrl = evt.target?.result as string

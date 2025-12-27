@@ -57,8 +57,8 @@ async function initPageData() {
   await partsStore.fetchCategories()
   await partsStore.fetchSites()
   
-  // 默认选中用户所属场站 (如果用户只能看自己场站)
-  if (userStore.user?.site_id && !userStore.user.can_view_all_sites) {
+  // 默认选中用户所属场站
+  if (userStore.user?.site_id) {
     selectedSite.value = userStore.user.site_id
   }
   

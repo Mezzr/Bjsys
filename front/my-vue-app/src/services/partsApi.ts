@@ -74,9 +74,9 @@ export const partsApi = {
 
   // Spare Parts
   getSpareParts: (params: SparePartFilter) => api.get('/spare-parts/', { params }),
-  createSparePart: (data: Partial<SparePart>) => api.post('/spare-parts/', data),
+  createSparePart: (data: Partial<SparePart> | FormData) => api.post('/spare-parts/', data),
   getSparePart: (id: number | string) => api.get(`/spare-parts/${id}/`),
-  updateSparePart: (id: number | string, data: Partial<SparePart>) => api.patch(`/spare-parts/${id}/`, data),
+  updateSparePart: (id: number | string, data: Partial<SparePart> | FormData) => api.patch(`/spare-parts/${id}/`, data),
   deleteSparePart: (id: number | string) => api.delete(`/spare-parts/${id}/`),
 
   // Transactions
