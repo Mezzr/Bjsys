@@ -2,6 +2,7 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePartsStore } from '../stores/parts'
+import { logger } from '../utils/logger'
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
 import { ElTable, ElTableColumn, ElButton, ElInput, ElSelect, ElOption, ElPagination, ElIcon, ElMessageBox, ElMessage } from 'element-plus'
@@ -75,7 +76,7 @@ async function loadParts() {
     site_id: selectedSite.value,
     status: selectedStatus.value
   })
-  console.log('PartsList received parts:', parts.value)
+  logger.log('PartsList received parts:', parts.value)
 }
 
 function handleSearch() {

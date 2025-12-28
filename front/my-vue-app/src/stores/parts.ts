@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { partsApi, type SparePart, type Category, type Transaction, type SparePartFilter, type Site } from '../services/partsApi'
+import { logger } from '../utils/logger'
 
 export type Part = SparePart
 
@@ -28,11 +29,11 @@ export const usePartsStore = defineStore('parts', {
       this.loading = true
       try {
         const res = await partsApi.getSpareParts(params)
-        console.log('fetchParts raw response:', res) // Debug log 1
+        logger.log('fetchParts raw response:', res) // Debug log 1
         
         // Assuming backend returns { code: 0, data: { results: [], count: 0 } }
         const data = res.data || res
-        console.log('fetchParts processed data:', data) // Debug log 2
+        logger.log('fetchParts processed data:', data) // Debug log 2
 
         if (data.items) { // Check for 'items' first as per your backend response structure
             this.parts = data.items
@@ -47,7 +48,7 @@ export const usePartsStore = defineStore('parts', {
             this.parts = []
             this.total = 0
         }
-        console.log('fetchParts final state:', { parts: this.parts, total: this.total }) // Debug log 3
+        logger.log('fetchParts final state:', { parts: this.parts, total: this.total }) // Debug log 3
         return this.parts
       } finally {
         this.loading = false
