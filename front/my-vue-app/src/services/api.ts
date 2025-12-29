@@ -13,7 +13,9 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     // 添加必要的 headers 来处理 CORS
-    config.headers['Content-Type'] = 'application/json'
+    if (!(config.data instanceof FormData)) {
+      config.headers['Content-Type'] = 'application/json'
+    }
     return config
   },
   (error: any) => {
