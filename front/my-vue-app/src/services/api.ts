@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
+  baseURL: '/api', // 直接使用相对路径，由 Vite 代理或 Nginx 转发
   withCredentials: true,
 })
 
